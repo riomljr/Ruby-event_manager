@@ -37,9 +37,17 @@ def clean_phone_numbers(phone)
   number = phone.gsub(/[^\d]/, "").rjust(10,'0')[0..9]
 end
 
+def find_most_of(input)
+  input.max_by{|element| input.count(element)}
+  # input.reduce(Hash.new(0)) do |result, hour|
+  #  result[hour] += 1
+  #  result 
+  # end
+end
+
 def get_time(day)
- get_hour = DateTime.strptime(day, '%m/%d/%Y %H:%M')
- get_hour.strftime("%l %P")
+ date = DateTime.strptime(day, '%m/%d/%Y %H:%M')
+ hour = date.strftime("%l %P")
 end
 
 def get_day(date)
@@ -47,6 +55,13 @@ def get_day(date)
   Date::DAYNAMES[day_of_the_week.wday]
 end
 
+def get_popular(day)
+  day_time =[]
+  date = DateTime.strptime(day, '%m/%d/%Y %H:%M')
+  day_time.push(date.strftime("%l %P"))
+  day_time.push(Date::DAYNAMES[date.wday])
+  day_time
+end
 
 puts 'EventManager initialized.'
 
@@ -58,15 +73,8 @@ contents = CSV.open(
 
 template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
-hours = []
-days =[]
 
-def find_most_of(hours)
-  hours.reduce(Hash.new(0)) do |result, hour|
-    result[hour] += 1
-    result 
-  end
-end
+dates =[]
 
 contents.each do |row|
   id = row[0]
@@ -75,15 +83,14 @@ contents.each do |row|
   legislators = legislators_by_zipcode(zipcode)
   phone = clean_phone_numbers(row[:homephone])
 
-  hours.push(get_time(row[:regdate]))
-  days.push(get_day(row[:regdate]))
-  
-  #form_letter = erb_template.result(binding)
+  dates.push(get_popular(row[:regdate]))
 
-  #save_thank_you_letter(id,form_letter)
+  form_letter = erb_template.result(binding)
+
+  save_thank_you_letter(id,form_letter)
 end
-p find_most_of(hours)
-p find_most_of(days)
+
+p "The best day and time is #{find_most_of(dates)}"
 
 
 
