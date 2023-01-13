@@ -45,16 +45,6 @@ def find_most_of(input)
   # end
 end
 
-def get_time(day)
- date = DateTime.strptime(day, '%m/%d/%Y %H:%M')
- hour = date.strftime("%l %P")
-end
-
-def get_day(date)
-  day_of_the_week = DateTime.strptime(date, '%m/%d/%Y %H:%M')
-  Date::DAYNAMES[day_of_the_week.wday]
-end
-
 def get_popular(day)
   day_time =[]
   date = DateTime.strptime(day, '%m/%d/%Y %H:%M')
